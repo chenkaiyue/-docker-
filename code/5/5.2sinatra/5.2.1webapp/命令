@@ -1,0 +1,5 @@
+chmod +x webapp/bin/webapp
+docker run -d -p4567 --name webapp -v $PWD/webapp:/opt/webapp jamtur01/sinatra
+docker logs webapp
+docker logs -f webapp
+docker port webapp 4567

@@ -1,0 +1,36 @@
+
+ip addr show docker0  显示网络接口docker0
+
+5: docker0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether 02:42:10:d8:c7:7f brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 scope global docker0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::42:10ff:fed8:c77f/64 scope link 
+       valid_lft forever preferred_lft forever
+
+405: vethb3ec4f6: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-77a4a259101a state UP group default 
+    link/ether e6:3e:29:53:8f:7a brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::e43e:29ff:fe53:8f7a/64 scope link 
+       valid_lft forever preferred_lft forever
+
+
+docker inspect -f '{{ .NetworkingSetting.IPAddress }}'
+
+
+
+---------------------------------------
+通过docker networking的形式连接
+docker network create app
+docker network inspect app
+docker run -d --net=app --name db jamtur01/redis
+docker run -p 4567 --net=app --name webapp -t -i -v $PWD/webapp:/opt/webapp sinatra /bin/bash
+在同一个网络中的主机的/etc/hosts文件中就有其他主机的ip地址，然后通过nginx配置代码中指定连接redis的端口进行协同，连接
+
+
+docker network connect app db2
+docker network disconnect app db2
+
+----------------------------------------
+docker run -d --name redis redis
+docker run -p 4567 --name webapp --link redis:db -t -i -v $PWD/webapp_redis:/opt/webapp sinatra /bin/bash
+在/etc/hosts文件中将出现ip；env变量中将出现相关的连接变量，在nginx的配置文件中通过这些变量指定web连接的对象（redis）
